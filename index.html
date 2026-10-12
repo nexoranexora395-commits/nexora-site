@@ -278,6 +278,10 @@ html.modal-open { overflow: hidden; }
 .pay-info li { margin-bottom: 4px; }
 .acct { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 12px; background: rgba(0, 245, 255, 0.06); border: 1px dashed rgba(0, 245, 255, 0.4); }
 .acct span { font-size: .8rem; color: var(--muted); }
+.acct strong { word-break: break-all; }
+.copy-btn { align-self: flex-start; margin-top: 6px; font: 600 .85rem var(--font-body); padding: 6px 14px; border-radius: 999px; border: 1px solid var(--cyan); background: rgba(0, 245, 255, .08); color: var(--cyan); cursor: pointer; transition: background .2s, color .2s; }
+.copy-btn:hover { background: var(--cyan); color: #04070a; }
+.copy-btn.copied { background: var(--ok); border-color: var(--ok); color: #04070a; }
 .summary { margin: 18px 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--bg-2); }
 .summary div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
 .summary dt { color: var(--muted); } .summary dd { margin: 0; font-weight: 600; text-align: right; }
@@ -490,7 +494,7 @@ html.over-text .cursor, html.over-text .cursor-dot, html.over-text .trail-dot, h
     <h1>Tout le digital.<br>Un seul endroit.</h1>
     <p class="lead">Musique, films, jeux, intelligence artificielle et logiciels. Choisissez votre offre, payez localement et recevez votre accès rapidement.</p>
     <a class="btn btn-primary" href="#explore">Trouver mon abonnement</a>
-    <p class="fine">Paiement par BaridiMob · Support WhatsApp · Livraison rapide</p>
+    <p class="fine">Paiement local (BaridiMob, CCP, remise en main propre) · Support WhatsApp · Livraison rapide</p>
     <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
   </section>
 
@@ -624,8 +628,12 @@ const CONFIG = {
 };
 
 const PAY = {
-  baridimob: { label: "BaridiMob", blurb: "Depuis l'application BaridiMob", icon: "📱", acctLabel: "BaridiMob (RIP)", acct: "00799999004488391624 — nom : Adem Belgaid",
-    steps: ["Ouvrez l'application BaridiMob et faites un transfert.", "Envoyez le montant exact au numéro indiqué.", "Gardez la capture du reçu et envoyez-la sur WhatsApp."] },
+  baridimob: { label: "BaridiMob", blurb: "Depuis l'application BaridiMob", icon: "📱", acctLabel: "RIP BaridiMob", acct: "00799999004488391675 — nom : Adem Belgaid", copy: "00799999004488391675",
+    steps: ["Ouvrez l'application BaridiMob et faites un transfert.", "Copiez le RIP ci-dessus et collez-le comme destinataire.", "Gardez la capture du reçu et envoyez-la sur WhatsApp."] },
+  ccp: { label: "CCP", blurb: "Virement postal", icon: "✉️", acctLabel: "CCP", acct: "44883916 · clé 24 — nom : Adem Belgaid", copy: "44883916",
+    steps: ["Effectuez un virement vers le CCP indiqué.", "Gardez le reçu postal.", "Envoyez le reçu sur WhatsApp."] },
+  main: { label: "Main propre (Kouba)", blurb: "Paiement en espèces à Kouba", icon: "🤝", acctLabel: "Lieu", acct: "Kouba, Alger",
+    steps: ["Confirmez votre commande.", "Nous fixons le lieu et l'heure sur WhatsApp.", "Payez en espèces lors de la remise."] }
 };
 
 /* Durée : 1, 3 ou 12 mois, avec une remise sur les longues durées */
@@ -884,7 +892,7 @@ function payDetails() {
   if (!st.pay) return `<p class="muted">Choisissez un moyen de paiement pour voir les instructions.</p>`;
   const m = PAY[st.pay];
   return `<div class="pay-info"><h4>Comment payer avec ${esc(m.label)}</h4>
-    ${m.acct ? `<p class="acct"><span>${esc(m.acctLabel)}</span><strong>${esc(m.acct)}</strong></p>` : ""}
+    ${m.acct ? `<p class="acct"><span>${esc(m.acctLabel)}</span><strong>${esc(m.acct)}</strong>${m.copy ? `<button type="button" class="copy-btn" data-copy="${esc(m.copy)}">Copier</button>` : ""}</p>` : ""}
     <ol style="margin-top:12px">${m.steps.map(t => `<li>${esc(t)}</li>`).join("")}</ol></div>`;
 }
 const summaryHTML = () => `<dl class="summary">
@@ -893,7 +901,6 @@ const summaryHTML = () => `<dl class="summary">
   <div><dt>Paiement</dt><dd>${esc(payLabel())}</dd></div>
   <div class="total"><dt>Total</dt><dd>${fmt(plan().price)}</dd></div></dl>`;
 
-const banner = () => `<p class="sample-banner"><strong>Données d'exemple.</strong> ${esc(CONFIG.sampleNotice)}</p>`;
 function customCard() {
   const on = st.planIdx === "custom", n = customUsd();
   return `<div class="plan plan-custom${on ? " is-selected" : ""}" data-plan="custom" aria-pressed="${on}">
@@ -905,13 +912,13 @@ function customCard() {
 }
 
 const views = [
-  () => `${banner()}<h3 class="step-title" tabindex="-1">Choisissez votre offre</h3>
+  () => `<h3 class="step-title" tabindex="-1">Choisissez votre offre</h3>
     <p class="step-sub">Prix en dinars algériens (DA).</p>
     <div class="plans" role="group" aria-label="Offres">${planCards()}${st.product.credit ? customCard() : ""}</div>
     <p class="form-error" id="err" role="alert"></p>
     <div class="actions"><button type="button" class="btn btn-ghost" data-close>Annuler</button><button type="button" class="btn btn-primary" data-next>Continuer</button></div>`,
 
-  () => `${banner()}<h3 class="step-title" tabindex="-1">Choisissez le moyen de paiement</h3>
+  () => `<h3 class="step-title" tabindex="-1">Choisissez le moyen de paiement</h3>
     <p class="step-sub">Rien n'est débité sur ce site. Le paiement se fait selon les instructions ci-dessous.</p>
     <div class="pays" role="group" aria-label="Moyens de paiement">${payCards()}</div>
     ${payDetails()}
@@ -958,7 +965,7 @@ const showErr = msg => {
 
 function openOrder(id, from) {
   const product = byId(id); if (!product) return;
-  st = { product, planIdx: 0, custom: "", pay: "baridimob", name: "", email: "", phone: "", note: "", agree: false, ref: null };
+  st = { product, planIdx: 0, custom: "", pay: null, name: "", email: "", phone: "", note: "", agree: false, ref: null };
   step = 0; opener = from || document.activeElement;
   $("orderTile").textContent = product.icon;
   $("orderCat").textContent = product.cat;
@@ -982,9 +989,25 @@ document.addEventListener("click", e => {
   if (card && !root.contains(e.target)) openOrder(card.dataset.id, card.querySelector(".visit"));
 });
 
+function fallbackCopy(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) {}
+  ta.remove();
+}
+
 /* Actions dans la fenêtre */
 root.addEventListener("click", async e => {
   const t = e.target;
+  const cp = t.closest("[data-copy]");
+  if (cp) {
+    const text = cp.dataset.copy;
+    const done = () => { cp.textContent = "Copié ✓"; cp.classList.add("copied"); setTimeout(() => { cp.textContent = "Copier"; cp.classList.remove("copied"); }, 1600); };
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done)); }
+    else { fallbackCopy(text, done); }
+    return;
+  }
   if (t.closest("[data-close]")) return closeOrder();
   const pl = t.closest("[data-plan]"), py = t.closest("[data-pay]");
   if (pl) { if (pl.dataset.plan === "custom" && st.planIdx === "custom") return; st.planIdx = pl.dataset.plan === "custom" ? "custom" : +pl.dataset.plan; render("fwd", false); body.querySelector(`[data-plan="${st.planIdx}"]`)?.focus(); return; }
