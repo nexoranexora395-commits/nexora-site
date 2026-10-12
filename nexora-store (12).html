@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEXORA — Abonnements digitaux en Algérie</title>
+<meta name="description" content="NEXORA : abonnements Spotify, YouTube Premium, Netflix, ChatGPT Plus, jeux et plus. Paiement local et livraison rapide en Algérie.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== NEXORA — couleurs et polices modifiables ici ===== */
+:root {
+  color-scheme: dark;
+  --bg: #050608;
+  --bg-2: #0d1117;
+  --card: #10141c;
+  --ink: #f5f7ff;
+  --muted: #9ca3af;
+  --line: rgba(255, 255, 255, 0.08);
+  --cyan: #00f5ff;
+  --purple: #8b5cf6;
+  --purple-soft: #a78bfa;
+  --grad: linear-gradient(120deg, var(--cyan), var(--purple));
+  --glow-cyan: 0 0 0 4px rgba(0, 245, 255, 0.14), 0 0 28px rgba(0, 245, 255, 0.25);
+  --radius: 18px;
+  --font-head: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --ok: #25d366;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; background: var(--bg); }
+body {
+  margin: 0; color: var(--ink);
+  font: 400 1.0625rem/1.6 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before {
+  content: ""; position: fixed; inset: -12%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 520px at 85% -5%, rgba(139, 92, 246, 0.20), transparent 60%),
+    radial-gradient(800px 480px at 5% 12%, rgba(0, 245, 255, 0.11), transparent 60%),
+    radial-gradient(900px 600px at 50% 110%, rgba(139, 92, 246, 0.10), transparent 60%);
+  animation: glowDrift 30s ease-in-out infinite alternate;
+}
+@keyframes glowDrift { to { transform: translate3d(4%, -3%, 0) scale(1.1); } }
+body::after {
+  content: ""; position: fixed; inset: -64px 0 0 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(rgba(0, 245, 255, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 20%, transparent 75%);
+  animation: gridMove 14s linear infinite;
+}
+@keyframes gridMove { to { transform: translateY(64px); } }
+.bg-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+h1, h2, h3 { font-family: var(--font-head); line-height: 1.08; margin: 0; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; }
+::selection { background: rgba(0, 245, 255, 0.3); }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--cyan); color: #001417; padding: 8px 14px; border-radius: 8px; z-index: 100; font-weight: 600; }
+.skip:focus { left: 8px; }
+.muted { color: var(--muted); }
+
+/* Nav */
+.nav {
+  position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px clamp(20px, 5vw, 64px); background: rgba(5, 6, 8, 0.72);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent; transition: border-color .3s, box-shadow .3s;
+}
+.nav.scrolled { border-bottom-color: var(--line); box-shadow: 0 1px 24px rgba(139, 92, 246, 0.12); }
+.logo { display: inline-flex; align-items: center; gap: 10px; font: 800 1.25rem var(--font-head); letter-spacing: .08em; text-decoration: none; }
+.logo-mark { width: 22px; height: 22px; border-radius: 7px; background: var(--grad); transform: rotate(12deg); box-shadow: 0 0 16px rgba(0, 245, 255, 0.45); animation: bobT 5s ease-in-out infinite alternate; }
+@keyframes bobT { to { translate: 0 -4px; } }
+.menu { display: flex; gap: 6px; }
+.menu a { text-decoration: none; padding: 8px 16px; border-radius: 999px; font-weight: 500; color: var(--muted); transition: color .2s, background .2s, box-shadow .2s; }
+.menu a:hover { color: var(--ink); background: rgba(255, 255, 255, 0.05); }
+.menu a.active { color: var(--cyan); background: rgba(0, 245, 255, 0.08); box-shadow: inset 0 0 0 1px rgba(0, 245, 255, 0.25); }
+.burger { display: none; background: none; border: 0; width: 44px; height: 44px; cursor: pointer; position: relative; }
+.burger span { position: absolute; left: 11px; right: 11px; height: 2px; background: var(--cyan); border-radius: 2px; transition: transform .25s; }
+.burger span:first-child { top: 17px; } .burger span:last-child { top: 25px; }
+.burger[aria-expanded="true"] span:first-child { transform: translateY(4px) rotate(45deg); }
+.burger[aria-expanded="true"] span:last-child { transform: translateY(-4px) rotate(-45deg); }
+
+/* Hero */
+.hero { padding: clamp(64px, 12vw, 150px) clamp(20px, 5vw, 64px) 0; max-width: 1200px; margin: 0 auto; position: relative; isolation: isolate; }
+.orbs { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.orb { position: absolute; border-radius: 50%; animation: breathe 9s ease-in-out infinite alternate; }
+.orb-cyan { right: -10%; top: -14%; width: min(560px, 70vw); aspect-ratio: 1; background: radial-gradient(circle, rgba(0, 245, 255, 0.20), transparent 65%); }
+.orb-purple { left: 28%; top: 18%; width: min(500px, 65vw); aspect-ratio: 1; background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 65%); animation-duration: 12s; }
+@keyframes breathe { to { transform: scale(1.15); opacity: .7; } }
+.ring { position: absolute; right: 12%; top: 24%; width: 120px; height: 120px; border-radius: 50%; border: 1px solid rgba(0, 245, 255, 0.45); box-shadow: 0 0 30px rgba(0, 245, 255, 0.18); animation: bob 11s ease-in-out infinite alternate; }
+.diamond { position: absolute; right: 28%; top: 64%; width: 54px; height: 54px; border: 1px solid rgba(139, 92, 246, 0.7); transform: rotate(45deg); animation: bob 8s ease-in-out infinite alternate; }
+@keyframes bob { to { transform: translateY(-20px) rotate(14deg); } }
+.kicker { display: inline-block; color: var(--cyan); font-weight: 600; margin-bottom: 22px; padding: 6px 16px; border-radius: 999px; background: rgba(0, 245, 255, 0.07); border: 1px solid rgba(0, 245, 255, 0.28); font-size: .95rem; }
+.hero h1 {
+  font-size: clamp(2.8rem, 9vw, 7rem); font-weight: 800; max-width: 11ch; padding-bottom: .08em;
+  background-image: linear-gradient(100deg, #fff 0%, var(--cyan) 28%, var(--purple) 58%, var(--cyan) 85%, #fff 100%);
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: heroIn 1.1s cubic-bezier(.2, .7, .2, 1) .15s backwards, sheen 9s ease-in-out 1.3s infinite alternate;
+}
+@keyframes sheen { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+@keyframes heroIn { from { opacity: 0; transform: translateY(26px); filter: blur(8px); } }
+.hero .kicker, .hero .lead, .hero .btn, .hero .fine { animation: heroIn 1s cubic-bezier(.2, .7, .2, 1) backwards; }
+.hero .lead { animation-delay: .45s; } .hero .btn { animation-delay: .6s; } .hero .fine { animation-delay: .75s; }
+.lead { font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--muted); max-width: 34em; margin: 28px 0 38px; }
+.fine { color: var(--muted); font-size: .9rem; margin-top: 18px; }
+.ticker { margin: 80px calc(-1 * clamp(20px, 5vw, 64px)) 0; overflow: hidden; border-block: 1px solid var(--line); padding: 18px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.ticker-track { display: flex; gap: 48px; width: max-content; animation: slide 50s linear infinite; font: 700 1.5rem var(--font-head); color: rgba(156, 163, 175, 0.7); white-space: nowrap; }
+.ticker-track span:nth-child(3n+1) { color: rgba(0, 245, 255, 0.55); }
+.ticker-track span:nth-child(3n+2) { color: rgba(167, 139, 250, 0.6); }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* Buttons */
+.btn { display: inline-block; font: 600 1rem var(--font-body); padding: 14px 28px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: transform .2s, box-shadow .25s, background .2s, border-color .2s; }
+.btn-primary { background: var(--grad); color: #04070a; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 245, 255, 0.32), 0 0 22px rgba(139, 92, 246, 0.35); }
+.btn-ghost { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.5); color: var(--ink); }
+.btn-ghost:hover { background: rgba(139, 92, 246, 0.22); box-shadow: 0 0 24px rgba(139, 92, 246, 0.35); transform: translateY(-2px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* Sections */
+.section { max-width: 1200px; margin: 0 auto; padding: clamp(64px, 9vw, 120px) clamp(20px, 5vw, 64px) 0; }
+.band { max-width: none; margin-top: clamp(64px, 9vw, 120px); padding-bottom: clamp(64px, 9vw, 120px); background: linear-gradient(180deg, rgba(13, 17, 23, 0.78), rgba(13, 17, 23, 0.5)); border-block: 1px solid var(--line); }
+.band > * { max-width: 1072px; margin-inline: auto; }
+.section h2 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 700; padding-bottom: .08em; }
+.section h2.sub { margin-top: 64px; font-size: clamp(1.6rem, 3.5vw, 2.3rem); }
+.section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap; margin-bottom: 32px; }
+.section-head h2 { background: linear-gradient(110deg, #ffffff 0%, var(--cyan) 55%, var(--purple) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Search + chips */
+.search { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 0 22px; color: var(--muted); transition: border-color .2s, box-shadow .25s, color .2s; }
+.search:focus-within { border-color: var(--cyan); box-shadow: var(--glow-cyan); color: var(--cyan); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; color: var(--ink); padding: 17px 0; outline: none; }
+.search input::placeholder { color: #6b7280; }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0 8px; }
+.chip { font: 500 .95rem var(--font-body); padding: 9px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; transition: color .2s, border-color .2s, background .2s, box-shadow .2s; }
+.chip:hover { color: var(--ink); border-color: rgba(0, 245, 255, 0.4); }
+.chip[aria-pressed="true"] { color: var(--cyan); border-color: var(--cyan); background: rgba(0, 245, 255, 0.09); box-shadow: 0 0 18px rgba(0, 245, 255, 0.2); }
+.status { color: var(--muted); font-size: .95rem; min-height: 1.6em; margin-bottom: 12px; }
+
+/* Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card {
+  position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; display: flex; flex-direction: column; gap: 14px; cursor: pointer;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transition: transform .18s ease-out, box-shadow .3s ease, border-color .3s ease;
+  animation: pop .4s backwards;
+}
+@keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+.card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; border-radius: var(--radius); background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent); opacity: .6; transition: opacity .3s; }
+.card:hover, .card:focus-within { --lift: -6px; border-color: rgba(0, 245, 255, 0.45); box-shadow: 0 0 0 1px rgba(0, 245, 255, 0.15), 0 18px 44px rgba(139, 92, 246, 0.22), 0 0 30px rgba(0, 245, 255, 0.1); }
+.card:hover::before, .card:focus-within::before { opacity: 1; background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent); }
+.tile { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem; background: rgba(0, 245, 255, 0.07); border: 1px solid rgba(0, 245, 255, 0.3); transition: box-shadow .3s, background .3s; }
+.card:hover .tile { background: rgba(0, 245, 255, 0.14); box-shadow: 0 0 20px rgba(0, 245, 255, 0.35); }
+.card .cat { color: var(--purple-soft); font-weight: 600; font-size: .85rem; }
+.card h3 { font-size: 1.5rem; }
+.card p { color: var(--muted); flex: 1; font-size: 1rem; }
+.visit { width: 100%; background: none; border: 0; border-top: 1px solid var(--line); font: inherit; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer; padding: 14px 0 0; display: flex; justify-content: space-between; transition: color .2s; }
+.visit::after { content: "→"; color: var(--cyan); }
+.visit:hover { color: var(--cyan); }
+.grid-3 .card { animation: pop .4s backwards, floaty 7s ease-in-out infinite alternate; }
+.grid-3 .card:nth-child(2) { animation-duration: .4s, 8.5s; animation-delay: 0s, -2s; }
+.grid-3 .card:nth-child(3) { animation-duration: .4s, 6.5s; animation-delay: 0s, -4s; }
+@keyframes floaty { to { translate: 0 -7px; } }
+.cat-block { margin-bottom: 72px; } .cat-block h2 { margin-bottom: 28px; font-size: clamp(1.8rem, 4vw, 2.4rem); }
+.empty { text-align: center; padding: 48px 0; color: var(--muted); } .empty .btn { margin-top: 16px; }
+
+/* GTA banner */
+.gta {
+  position: relative; overflow: hidden; border-radius: 24px; border: 1px solid var(--line);
+  background: linear-gradient(135deg, #1a0b2e, #0a0b10 60%, #0c2a33); padding: 40px 34px;
+}
+.gta::before { content: ""; position: absolute; inset: -50%; background: conic-gradient(from 0deg, transparent, rgba(0, 245, 255, 0.16), transparent 30%); animation: spin 10s linear infinite; pointer-events: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.gta-inner { position: relative; display: grid; gap: 14px; }
+.gta-tag { color: var(--cyan); font-weight: 800; letter-spacing: 3px; font-size: .8rem; }
+.gta-logo { font-family: Impact, "Arial Black", sans-serif; font-weight: 900; font-size: clamp(3.2rem, 11vw, 6.5rem); line-height: .9; letter-spacing: 3px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gta-sub { color: var(--muted); font-size: .95rem; }
+.countdown { display: flex; gap: 12px; flex-wrap: wrap; }
+.cd-box { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; min-width: 84px; text-align: center; }
+.cd-box strong { display: block; font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.cd-box span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* About + contact */
+.about p { max-width: 42em; margin-top: 20px; color: var(--muted); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 56px; }
+.notes > div { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+.notes h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--cyan); }
+.notes p { font-size: 1rem; }
+.contact-links { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 28px; }
+.contact-links a { text-decoration: none; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 6px; transition: transform .25s, border-color .25s; }
+.contact-links a:hover { transform: translateY(-4px); border-color: rgba(0, 245, 255, 0.45); }
+.contact-links strong { font-family: var(--font-head); font-size: 1.1rem; }
+.contact-links small { color: var(--muted); }
+
+/* Footer */
+.footer { max-width: 1200px; margin: 100px auto 0; padding: 48px clamp(20px, 5vw, 64px) 40px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 32px; position: relative; }
+.footer::before { content: ""; position: absolute; top: -1px; left: 0; width: 40%; height: 1px; background: var(--grad); opacity: .7; }
+.footer p { color: var(--muted); max-width: 34em; margin-top: 14px; font-size: .95rem; }
+.footer nav { display: flex; gap: 22px; align-items: flex-start; }
+.footer nav a { text-decoration: none; font-weight: 500; color: var(--muted); transition: color .2s; }
+.footer nav a:hover { color: var(--cyan); }
+.footer .copy { grid-column: 1 / -1; margin: 0; font-size: .9rem; }
+.to-top { position: fixed; right: 20px; bottom: 20px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(0, 245, 255, 0.4); background: rgba(16, 20, 28, 0.9); color: var(--cyan); font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 20px rgba(0, 245, 255, 0.2); z-index: 40; }
+.to-top[hidden] { display: none; }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s, transform .6s; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ===== ORDER WINDOW ===== */
+html.modal-open { overflow: hidden; }
+.order { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; }
+.order[hidden] { display: none; }
+.order-backdrop { position: absolute; inset: 0; background: rgba(3, 4, 6, 0.8); backdrop-filter: blur(6px); animation: fadeIn .25s ease; }
+.order-panel {
+  position: relative; width: min(780px, 100%); max-height: min(92vh, 920px); max-height: min(92dvh, 920px);
+  overflow-y: auto; overscroll-behavior: contain;
+  background: linear-gradient(180deg, #131928, var(--card) 40%);
+  border: 1px solid rgba(0, 245, 255, 0.28); border-radius: 22px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65), 0 0 70px rgba(139, 92, 246, 0.22);
+  animation: panelIn .38s cubic-bezier(.2, .8, .2, 1);
+}
+.order.closing .order-panel { animation: panelOut .2s ease forwards; }
+.order.closing .order-backdrop { animation: fadeOut .2s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; } } @keyframes fadeOut { to { opacity: 0; } }
+@keyframes panelIn { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@keyframes panelOut { to { opacity: 0; transform: translateY(12px) scale(.98); } }
+.order-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 16px; padding: 18px 22px; background: rgba(19, 25, 40, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.order-id { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+.order-id .tile { width: 46px; height: 46px; font-size: 1.3rem; }
+.order-id h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); }
+.order-id .cat { color: var(--purple-soft); font-size: .85rem; font-weight: 600; }
+.order-close { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 1.5rem; line-height: 1; cursor: pointer; transition: color .2s, border-color .2s, box-shadow .2s; }
+.order-close:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 16px rgba(0, 245, 255, 0.3); }
+.steps { list-style: none; display: flex; gap: 8px; margin: 0; padding: 18px 22px 4px; }
+.steps li { flex: 1; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .9rem; font-weight: 500; }
+.steps li::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.steps li:last-child::after { display: none; }
+.steps .dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); font-size: .8rem; flex: none; transition: all .3s; }
+.steps .is-current { color: var(--ink); }
+.steps .is-current .dot { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 14px rgba(0, 245, 255, 0.35); }
+.steps .is-done .dot { background: var(--grad); color: #04070a; border-color: transparent; }
+.steps .is-done::after { background: var(--cyan); opacity: .5; }
+.order-body { padding: 14px 22px 26px; }
+.order-body.in-fwd { animation: stepFwd .4s cubic-bezier(.2, .8, .2, 1); }
+.order-body.in-back { animation: stepBack .4s cubic-bezier(.2, .8, .2, 1); }
+@keyframes stepFwd { from { opacity: 0; transform: translateX(34px); } }
+@keyframes stepBack { from { opacity: 0; transform: translateX(-34px); } }
+.step-title { font-size: 1.6rem; margin: 18px 0 6px; outline: none; }
+.step-sub { color: var(--muted); margin-bottom: 20px; }
+.plans, .pays { display: grid; gap: 14px; }
+.plans { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.plan, .pay { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; transition: transform .2s, border-color .25s, box-shadow .25s, background .25s; }
+.plan { display: flex; flex-direction: column; gap: 4px; padding: 18px; }
+.plan:hover, .pay:hover { transform: translateY(-3px); border-color: rgba(0, 245, 255, 0.5); }
+.plan.is-selected, .pay.is-selected { border-color: var(--cyan); background: rgba(0, 245, 255, 0.07); box-shadow: 0 0 0 1px rgba(0, 245, 255, 0.3), 0 12px 34px rgba(139, 92, 246, 0.28); }
+.plan-name { font: 700 1.1rem var(--font-head); }
+.plan-price { font: 800 1.6rem var(--font-head); color: var(--cyan); margin-top: 8px; }
+.plan-pick, .pay-pick { margin-top: 12px; text-align: center; padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: .9rem; color: var(--purple-soft); background: rgba(139, 92, 246, 0.14); border: 1px solid rgba(139, 92, 246, 0.5); transition: all .25s; }
+.is-selected .plan-pick, .is-selected .pay-pick { background: var(--grad); color: #04070a; border-color: transparent; }
+.pays { grid-template-columns: 1fr; margin-bottom: 18px; }
+.pay { display: flex; align-items: center; gap: 16px; padding: 16px 18px; }
+.pay-icon { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 14px; font-size: 1.4rem; background: rgba(0, 245, 255, 0.07); border: 1px solid rgba(0, 245, 255, 0.3); }
+.pay-text { flex: 1; display: flex; flex-direction: column; }
+.pay-text strong { font: 700 1.1rem var(--font-head); }
+.pay-text small { color: var(--muted); font-size: .9rem; }
+.pay-pick { margin: 0; flex: none; }
+.pay-info { padding: 18px 20px; background: var(--bg-2); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 16px; }
+.pay-info h4 { font: 700 1.05rem var(--font-head); margin: 0 0 10px; color: var(--cyan); }
+.pay-info p { color: var(--muted); font-size: .95rem; margin-bottom: 10px; }
+.pay-info ol { margin: 0; padding-left: 22px; color: var(--muted); font-size: .95rem; }
+.pay-info li { margin-bottom: 4px; }
+.acct { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 12px; background: rgba(0, 245, 255, 0.06); border: 1px dashed rgba(0, 245, 255, 0.4); }
+.acct span { font-size: .8rem; color: var(--muted); }
+.summary { margin: 18px 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--bg-2); }
+.summary div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.summary dt { color: var(--muted); } .summary dd { margin: 0; font-weight: 600; text-align: right; }
+.summary .total { border: 0; background: linear-gradient(90deg, rgba(0, 245, 255, 0.08), rgba(139, 92, 246, 0.14)); }
+.summary .total dd { color: var(--cyan); font: 800 1.35rem var(--font-head); }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.field label { display: block; font-weight: 500; margin-bottom: 6px; font-size: .95rem; }
+.field input, .field textarea { width: 100%; font: inherit; color: var(--ink); background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; outline: none; transition: border-color .2s, box-shadow .25s; }
+.field textarea { min-height: 70px; resize: vertical; }
+.field input:focus, .field textarea:focus { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+.field input[aria-invalid="true"] { border-color: #ff6b81; }
+.check { display: flex; gap: 12px; align-items: flex-start; margin-top: 14px; color: var(--muted); font-size: .95rem; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--cyan); flex: none; }
+.check strong { color: var(--ink); }
+.field-error, .form-error { color: #ff8da1; font-size: .9rem; min-height: 1.2em; margin: 6px 0 0; }
+.form-error { margin-top: 14px; }
+.shake { animation: shake .4s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.actions { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.actions .btn-primary { margin-left: auto; }
+.done-head { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+.done-head .step-title { margin: 0; }
+.check-draw { width: 52px; height: 52px; flex: none; fill: none; stroke: var(--cyan); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.6)); }
+.check-draw circle { stroke-dasharray: 145; stroke-dashoffset: 145; animation: draw .7s ease forwards; }
+.check-draw path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .45s .5s ease forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.badge-pending { display: inline-block; margin: 14px 0 6px; padding: 6px 16px; border-radius: 999px; font-weight: 600; font-size: .92rem; color: #fcd34d; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.5); }
+.ref-box { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding: 16px 20px; border-radius: 16px; background: rgba(0, 245, 255, 0.06); border: 1px solid rgba(0, 245, 255, 0.4); box-shadow: 0 0 30px rgba(0, 245, 255, 0.1); }
+.ref-box span { display: block; color: var(--muted); font-size: .85rem; }
+.ref-box strong { font: 800 1.7rem var(--font-head); letter-spacing: .08em; color: var(--cyan); user-select: all; }
+.notice { margin-top: 16px; padding: 12px 16px; border-radius: 12px; font-size: .9rem; color: var(--muted); background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.4); }
+.sample-banner { margin-top: 12px; padding: 10px 14px; font-size: .88rem; color: var(--purple-soft); background: rgba(139, 92, 246, 0.1); border: 1px dashed rgba(139, 92, 246, 0.6); border-radius: 12px; }
+.plan-custom { cursor: default; }
+.custom-in { display: flex; align-items: center; gap: 8px; margin-top: 8px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; }
+.custom-in span { color: var(--cyan); font-weight: 700; }
+.custom-in input { flex: 1; min-width: 0; width: 100%; font: inherit; color: var(--ink); background: none; border: 0; outline: none; padding: 10px 0; }
+.custom-in:focus-within { border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+.plan-period { color: var(--purple-soft); font-size: .9rem; font-weight: 500; }
+.plan-sample { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+/* Selected plan: compact card like the reference (name, price, Selected button) */
+.plan.is-selected .plan-period, .plan.is-selected .plan-note, .plan.is-selected .plan-sample { display: none; }
+.plan.is-selected .plan-price { margin-top: 6px; }
+.plan.is-selected .plan-pick { padding: 12px 14px; }
+.plan-note { color: var(--muted); font-size: .85rem; }
+.wa-link { display: inline-block; margin-top: 16px; color: var(--cyan); font-weight: 600; text-decoration: none; }
+
+
+/* ===== EXTRA ANIMATIONS ===== */
+@keyframes btnSweep { to { transform: translateX(120%); } }
+@keyframes cardSweep { to { transform: translateX(340%) skewX(-18deg); } }
+@keyframes tileBob { 30% { transform: translateY(-4px) rotate(-6deg); } 60% { transform: translateY(0) rotate(4deg); } }
+@keyframes chipPop { 40% { transform: scale(1.08); } }
+@keyframes selectPop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: none; } }
+@keyframes pickIn { from { transform: scale(.6); opacity: 0; } }
+@keyframes infoIn { from { opacity: 0; transform: translateY(10px); } }
+@keyframes lineGrow { from { transform: scaleX(0); } }
+@keyframes dotPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, .5); } 70% { box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); } }
+@keyframes searchPulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(0, 245, 255, .14); } 50% { box-shadow: 0 0 0 9px rgba(0, 245, 255, .03); } }
+@keyframes tickPop { from { transform: translateY(-40%); opacity: .3; } }
+
+/* Cards: light sweep on hover, icon wiggle */
+.card { overflow: hidden; }
+.card::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .07), transparent);
+  transform: skewX(-18deg);
+}
+.card:hover::after { animation: cardSweep .9s ease; }
+.card:hover .tile { animation: tileBob .6s ease; }
+
+/* Buttons: shine sweep */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .35), transparent 70%);
+  transform: translateX(-120%);
+}
+.btn-primary:hover::after { animation: btnSweep .8s ease; }
+.btn:active { transform: scale(.97); }
+
+/* Hero kicker shine */
+.kicker { position: relative; overflow: hidden; }
+.kicker::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .22), transparent);
+  transform: translateX(-100%); animation: btnSweep 3.2s ease-in-out 1.2s infinite;
+}
+
+/* Chips */
+.chip { transition: color .2s, border-color .2s, background .2s, box-shadow .2s, transform .15s; }
+.chip:active { transform: scale(.94); }
+.chip[aria-pressed="true"] { animation: chipPop .35s ease; }
+
+/* Search focus pulse */
+.search:focus-within { animation: searchPulse 1.8s ease-in-out infinite; }
+
+/* Nav underline */
+.menu a { position: relative; }
+.menu a::after {
+  content: ""; position: absolute; left: 16px; right: 16px; bottom: 4px; height: 1px;
+  background: var(--grad); transform: scaleX(0); transition: transform .3s ease;
+}
+.menu a:hover::after, .menu a.active::after { transform: scaleX(1); }
+
+/* Plans and payment methods */
+.plan.is-selected { animation: selectPop .45s cubic-bezier(.2, .8, .2, 1); }
+.is-selected .plan-pick, .is-selected .pay-pick { animation: pickIn .4s ease; }
+.pay.is-selected { animation: selectPop .45s cubic-bezier(.2, .8, .2, 1); }
+.plan:active, .pay:active { transform: scale(.98); }
+.pay-info { animation: infoIn .45s ease backwards; }
+.summary div { animation: infoIn .4s ease backwards; }
+.summary div:nth-child(2) { animation-delay: .05s; }
+.summary div:nth-child(3) { animation-delay: .1s; }
+.summary div:nth-child(4) { animation-delay: .15s; }
+.summary div:nth-child(5) { animation-delay: .2s; }
+
+/* Step progress */
+.steps .is-done::after { transform-origin: left; animation: lineGrow .6s ease both; }
+.steps .is-current .dot { animation: dotPulse 2s ease-in-out infinite; }
+.order-id h2 { animation: infoIn .5s .1s backwards; }
+.check-draw { animation: none; }
+
+/* Countdown digits */
+.cd-box { transition: transform .3s ease, border-color .3s ease; }
+.cd-box:hover { transform: translateY(-3px); border-color: rgba(0, 245, 255, .4); }
+.cd-box.tick strong { animation: tickPop .35s ease; }
+
+/* Footer links */
+.footer nav a { display: inline-block; transition: color .2s, transform .2s; }
+.footer nav a:hover { transform: translateY(-2px); }
+
+
+/* ===== CUSTOM CURSOR (souris uniquement) ===== */
+.cursor, .cursor-dot, .trail-dot { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; display: none; will-change: transform; transition: opacity .2s; }
+html.has-cursor .cursor, html.has-cursor .cursor-dot, html.has-cursor .trail-dot { display: block; }
+html.has-cursor * { cursor: none !important; }
+html.has-cursor input, html.has-cursor textarea { cursor: text !important; }
+html.over-text .cursor, html.over-text .cursor-dot, html.over-text .trail-dot, html.cursor-off .cursor, html.cursor-off .cursor-dot, html.cursor-off .trail-dot { opacity: 0; }
+.cursor i { position: absolute; left: 0; top: 0; display: block; transition: scale .3s cubic-bezier(.2, .8, .2, 1), opacity .25s, border-color .25s, background .25s, box-shadow .25s; }
+.c-aura { width: 80px; height: 80px; margin: -40px 0 0 -40px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 245, 255, .16), rgba(139, 92, 246, .08) 45%, transparent 70%); filter: blur(4px); animation: auraPulse 2.4s ease-in-out infinite; }
+@keyframes auraPulse { 50% { scale: 1.25; opacity: .6; } }
+.c-ring { width: 30px; height: 30px; margin: -15px 0 0 -15px; border: 1px solid var(--cyan); border-radius: 50%; box-shadow: 0 0 12px rgba(139, 92, 246, .55), inset 0 0 8px rgba(0, 245, 255, .15), 0 0 0 5px rgba(139, 92, 246, .08); }
+.c-dash { width: 46px; height: 46px; margin: -23px 0 0 -23px; border: 1px dashed rgba(139, 92, 246, .75); border-radius: 50%; animation: spin 9s linear infinite; }
+.c-h { width: 58px; height: 1px; margin-left: -29px; background: linear-gradient(90deg, transparent, var(--cyan) 28%, transparent 40%, transparent 60%, var(--cyan) 72%, transparent); }
+.c-v { width: 1px; height: 58px; margin-top: -29px; background: linear-gradient(180deg, transparent, var(--cyan) 28%, transparent 40%, transparent 60%, var(--cyan) 72%, transparent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.cursor.is-target .c-ring { scale: 1.9; border-color: var(--purple-soft); background: rgba(0, 245, 255, .07); box-shadow: 0 0 22px rgba(0, 245, 255, .5), 0 0 0 6px rgba(139, 92, 246, .12); }
+.cursor.is-target .c-aura { scale: 1.6; opacity: 1; }
+.cursor.is-target .c-dash { scale: 1.3; animation-duration: 2.5s; border-color: var(--cyan); }
+.cursor.is-target .c-h, .cursor.is-target .c-v { opacity: 0; }
+.cursor.is-down .c-ring { scale: .7; }
+.cursor.is-down .c-aura { scale: 1.9; }
+.cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px 2px rgba(0, 245, 255, .8); }
+.trail-dot { width: calc(6px - var(--i) * .6px); height: calc(6px - var(--i) * .6px); margin: calc((6px - var(--i) * .6px) / -2) 0 0 calc((6px - var(--i) * .6px) / -2); border-radius: 50%; background: hsl(calc(183 + var(--i) * 14) 95% 62%); box-shadow: 0 0 8px hsl(calc(183 + var(--i) * 14) 95% 62%); opacity: calc(.6 - var(--i) * .07); }
+.ripple { position: fixed; left: 0; top: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; border: 1px solid var(--cyan); box-shadow: 0 0 16px rgba(0, 245, 255, .6), 0 0 30px rgba(139, 92, 246, .4); pointer-events: none; z-index: 9998; animation: ripple .65s ease-out forwards; }
+@keyframes ripple { from { opacity: .9; transform: translate(var(--x), var(--y)) scale(.4); } to { opacity: 0; transform: translate(var(--x), var(--y)) scale(4.5); } }
+.spark-p { position: fixed; left: 0; top: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan), 0 0 16px var(--purple); pointer-events: none; z-index: 9998; }
+@media (hover: none), (max-width: 760px) { .cursor, .cursor-dot, .trail-dot { display: none !important; } }
+@media (max-width: 760px) {
+  .burger { display: block; }
+  .menu { position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: rgba(5, 6, 8, 0.97); padding: 12px 20px 20px; border-bottom: 1px solid var(--line); display: none; }
+  .menu.open { display: flex; }
+  .menu a { font-size: 1.1rem; padding: 14px 16px; }
+  .footer { grid-template-columns: 1fr; }
+  .grid, .grid-3 { grid-template-columns: 1fr; }
+  .orb-cyan, .orb-purple { opacity: .6; }
+  .ring, .diamond { display: none; }
+}
+@media (min-width: 761px) and (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) {
+  .order { padding: 0; place-items: end stretch; }
+  .order-panel { max-height: 94vh; max-height: 94dvh; border-radius: 22px 22px 0 0; width: 100%; }
+  .steps .lbl { display: none; } .steps { padding-inline: 18px; }
+  .order-body { padding-inline: 18px; }
+  .order-head { padding: 14px 18px; }
+  .actions .btn { flex: 1; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg" class="bg-canvas" aria-hidden="true"></canvas>
+<div class="cursor" id="cursor" aria-hidden="true"><i class="c-aura"></i><i class="c-dash"></i><i class="c-ring"></i><i class="c-h"></i><i class="c-v"></i></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<a class="skip" href="#explore">Aller au contenu</a>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#top" aria-label="Accueil NEXORA"><span class="logo-mark" aria-hidden="true"></span>NEXORA</a>
+  <nav id="menu" class="menu" aria-label="Principal">
+    <a href="#explore">Produits</a>
+    <a href="#categories">Catégories</a>
+    <a href="#about">À propos</a>
+    <a href="https://wa.me/213797784310" target="_blank" rel="noopener">Contactez-nous</a>
+  </nav>
+  <button class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu"><span></span><span></span></button>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="orbs" aria-hidden="true">
+      <span class="orb orb-cyan"></span>
+      <span class="orb orb-purple"></span>
+      <span class="ring"></span>
+      <span class="diamond"></span>
+    </div>
+    <p class="kicker">Vos abonnements digitaux, en un seul endroit</p>
+    <h1>Tout le digital.<br>Un seul endroit.</h1>
+    <p class="lead">Musique, films, jeux, intelligence artificielle et logiciels. Choisissez votre offre, payez localement et recevez votre accès rapidement.</p>
+    <a class="btn btn-primary" href="#explore">Trouver mon abonnement</a>
+    <p class="fine">Paiement par BaridiMob · Support WhatsApp · Livraison rapide</p>
+    <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+  </section>
+
+  <section class="section" style="padding-bottom:0">
+    <div class="gta" id="gtaBanner">
+      <div class="gta-inner">
+        <span class="gta-tag">BIENTÔT DISPONIBLE</span>
+        <div class="gta-logo">GTA VI</div>
+        <p class="gta-sub">Grand Theft Auto VI · PlayStation 5 et Xbox Series X|S · Sortie prévue le 19 novembre 2026</p>
+        <div class="countdown">
+          <div class="cd-box"><strong id="cdD">--</strong><span>Jours</span></div>
+          <div class="cd-box"><strong id="cdH">--</strong><span>Heures</span></div>
+          <div class="cd-box"><strong id="cdM">--</strong><span>Minutes</span></div>
+          <div class="cd-box"><strong id="cdS">--</strong><span>Secondes</span></div>
+        </div>
+        <a class="btn btn-ghost" style="align-self:start" href="https://wa.me/213797784310?text=Bonjour%2C%20je%20veux%20%C3%AAtre%20inform%C3%A9%20de%20la%20sortie%20de%20GTA%20VI" target="_blank" rel="noopener">Être informé sur WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="coming-soon" style="padding-bottom:0">
+    <div class="section-head"><h2>Bientôt disponible</h2></div>
+    <div class="grid grid-3">
+      <article class="card" aria-label="Boutiques en ligne, bientôt disponible">
+        <div class="tile" aria-hidden="true">🛍️</div>
+        <span class="cat">Bientôt disponible</span>
+        <h3>Boutiques en ligne</h3>
+        <p>Achetez des produits sur les grandes boutiques en ligne, avec notre accompagnement.</p>
+        <a class="visit" href="https://wa.me/213797784310?text=Bonjour%2C%20je%20veux%20%C3%AAtre%20inform%C3%A9%20de%20l%27ouverture%20de%20la%20cat%C3%A9gorie%20Boutiques%20en%20ligne." target="_blank" rel="noopener">Être informé sur WhatsApp</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="explore">
+    <div class="section-head">
+      <h2>Trouvez votre prochain abonnement.</h2>
+      <p class="muted">Parcourir par catégorie</p>
+    </div>
+    <div class="search">
+      <label class="sr" for="search" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Rechercher un abonnement</label>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="search" type="search" placeholder="Rechercher Spotify, Netflix, ChatGPT…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtrer par catégorie"></div>
+    <p class="status" id="status" aria-live="polite"></p>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>
+      <p>Aucun produit ne correspond à votre recherche.</p>
+      <button class="btn btn-ghost" id="reset" type="button">Effacer la recherche</button>
+    </div>
+  </section>
+
+  <section class="section band">
+    <h2>Les plus demandés</h2>
+    <div class="grid grid-3" id="featured"></div>
+    <h2 class="sub">Coup de cœur</h2>
+    <div class="grid grid-3" id="popular"></div>
+  </section>
+
+  
+
+  <section class="section" id="categories">
+    <div id="category-sections"></div>
+  </section>
+
+  <section class="section about" id="about">
+    <h2>Des abonnements fiables, livrés vite.</h2>
+    <p>NEXORA vend des abonnements et des crédits digitaux, avec un suivi après chaque commande. Les prix sont indiqués en dinars algériens (DA). Vérifiez toujours les conditions du service concerné avant de commander.</p>
+    <div class="notes">
+      <div>
+        <h3>Comment ça marche</h3>
+        <p>Choisissez votre offre, sélectionnez votre moyen de paiement, puis envoyez vos informations. Votre commande est transmise directement à notre équipe, qui vous contacte pour finaliser le paiement et l'activation.</p>
+      </div>
+      <div>
+        <h3>Confidentialité</h3>
+        <p>Vos informations servent uniquement à traiter votre commande. Ne transmettez jamais de mot de passe ni de code bancaire sur ce site.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <h2>Contactez-nous.</h2>
+    <p class="muted" style="margin-top:14px">Une question sur un abonnement ou une commande ? Écrivez-nous.</p>
+    <div class="contact-links">
+      <a href="https://wa.me/213797784310" target="_blank" rel="noopener"><span aria-hidden="true">💬</span><strong>WhatsApp</strong><small>Réponse rapide</small></a>
+      <a href="mailto:nexoranexora395@gmail.com"><span aria-hidden="true">✉️</span><strong>Email</strong><small>nexoranexora395@gmail.com</small></a>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:6px"><span aria-hidden="true">📍</span><strong>Alger</strong><small>Algérie</small></div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:6px"><span aria-hidden="true">🕘</span><strong>Horaires</strong><small>Tous les jours, 9h – 22h</small></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div>
+    <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"></span>NEXORA</a>
+    <p>Abonnements et crédits digitaux pour l'Algérie. NEXORA n'est affilié à aucun des services proposés. Toutes les marques appartiennent à leurs propriétaires respectifs.</p>
+  </div>
+  <nav aria-label="Pied de page"><a href="#about">À propos</a><a href="#contact">Contact</a></nav>
+  <p class="copy">© <span id="year"></span> NEXORA. Tous droits réservés.</p>
+</footer>
+
+<button class="to-top" id="toTop" aria-label="Revenir en haut" hidden>↑</button>
+
+<!-- Fenêtre de commande -->
+<div class="order" id="order" hidden>
+  <div class="order-backdrop" data-close></div>
+  <div class="order-panel" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+    <header class="order-head">
+      <div class="order-id">
+        <div class="tile" id="orderTile" aria-hidden="true"></div>
+        <div><span class="cat" id="orderCat"></span><h2 id="orderTitle"></h2></div>
+      </div>
+      <button class="order-close" type="button" data-close aria-label="Fermer">×</button>
+    </header>
+    <ol class="steps" id="steps" aria-label="Progression de la commande"></ol>
+    <div class="order-body" id="orderBody"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURATION — modifiez ces valeurs
+   ===================================================================== */
+const CONFIG = {
+  whatsapp: "213797784310",                          // numéro WhatsApp sans +
+  email: "nexoranexora395@gmail.com",
+  usdRate: 250,            // EXEMPLE : DA pour 1 USD. Remplacez par votre taux réel.
+  customMin: 1, customMax: 1000,   // montant personnalisé autorisé, en USD
+  sampleNotice: "Prix et coordonnées de paiement d'exemple. Remplacez-les dans CONFIG et PAY avant la mise en ligne.",
+  formspreeUrl: "https://formspree.io/f/mjygrovz"    // votre endpoint Formspree
+};
+
+const PAY = {
+  baridimob: { label: "BaridiMob", blurb: "Depuis l'application BaridiMob", icon: "📱", acctLabel: "BaridiMob (RIP)", acct: "00799999004488391624 — nom : Adem Belgaid",
+    steps: ["Ouvrez l'application BaridiMob et faites un transfert.", "Envoyez le montant exact au numéro indiqué.", "Gardez la capture du reçu et envoyez-la sur WhatsApp."] },
+};
+
+/* Durée : 1, 3 ou 12 mois, avec une remise sur les longues durées */
+const dur = b => [
+  { label: "1 mois", price: b },
+  { label: "3 mois", price: Math.round(b * 2.8) },
+  { label: "12 mois", price: b * 10 }
+];
+const CREDIT_USD = [5, 10, 20, 50, 100, 200];
+const credits = CREDIT_USD.map(usd => ({ label: `Crédit $${usd}`, price: usd * CONFIG.usdRate, usd }));
+
+/* ===== CATALOGUE — modifiez ici pour ajouter ou changer des produits ===== */
+const PRODUCTS = [
+  { id: "spotify", cat: "Musique", icon: "🎵", name: "Spotify Premium", desc: "Musique sans publicité, téléchargement hors ligne.", plans: dur(1200), tag: "Populaire" },
+  { id: "apple-music", cat: "Musique", icon: "🍎", name: "Apple Music", desc: "Catalogue complet, sans publicité, écoute hors ligne.", plans: dur(1200) },
+  { id: "deezer", cat: "Musique", icon: "🎧", name: "Deezer Premium", desc: "Qualité HiFi, sans publicité, mode hors ligne.", plans: dur(1000) },
+  { id: "ytmusic", cat: "Musique", icon: "🎶", name: "YouTube Music Premium", desc: "Sans publicité, lecture en arrière-plan.", plans: dur(1200) },
+  { id: "soundcloud", cat: "Musique", icon: "☁️", name: "SoundCloud Go+", desc: "Écoute sans publicité et hors ligne.", plans: dur(1000) },
+  { id: "netflix", cat: "Vidéo", icon: "🎬", name: "Netflix", desc: "Films et séries, plusieurs formules disponibles.", tag: "Populaire",
+    plans: [
+      { label: "Standard · 1 mois", price: 2000 }, { label: "Standard · 3 mois", price: 5600 }, { label: "Standard · 12 mois", price: 20000 },
+      { label: "Premium · 1 mois", price: 3000 }, { label: "Premium · 3 mois", price: 8400 }, { label: "Premium · 12 mois", price: 30000 }
+    ] },
+  { id: "disney", cat: "Vidéo", icon: "🏰", name: "Disney+ Premium", desc: "Disney, Pixar, Marvel et Star Wars.", plans: dur(1500) },
+  { id: "prime", cat: "Vidéo", icon: "📺", name: "Prime Video", desc: "Films et séries Amazon Originals.", plans: dur(1200) },
+  { id: "ytpremium", cat: "Vidéo", icon: "▶️", name: "YouTube Premium", desc: "Sans publicité, lecture en arrière-plan.", plans: dur(1500), tag: "Populaire" },
+  { id: "chatgpt", cat: "IA", icon: "🤖", name: "ChatGPT Plus", desc: "Modèles avancés et fonctions étendues.", plans: dur(4500), tag: "Nouveau" },
+  { id: "claude", cat: "IA", icon: "✨", name: "Claude Pro", desc: "Modèles avancés et limites d'utilisation élevées.", plans: dur(4500), tag: "Nouveau" },
+  { id: "canva", cat: "Design", icon: "🎨", name: "Canva Pro", desc: "Modèles premium et export haute qualité.", plans: dur(1000) },
+  { id: "gamepass", cat: "Gaming", icon: "🎮", name: "Xbox Game Pass Ultimate", desc: "Des centaines de jeux et le multijoueur en ligne.", plans: dur(3500) },
+  { id: "psplus", cat: "Gaming", icon: "🕹️", name: "PlayStation Plus", desc: "Jeux mensuels et multijoueur en ligne.", plans: dur(3000) },
+  { id: "discord", cat: "Gaming", icon: "💬", name: "Discord Nitro", desc: "Emojis animés, meilleure qualité vidéo.", plans: dur(1500) },
+  { id: "ea", cat: "Gaming", icon: "⚽", name: "EA Play", desc: "Accès aux jeux EA Sports, dont EA Sports FC.",
+    plans: [{ label: "1 mois", price: 1800 }, { label: "3 mois", price: 4800 }, { label: "12 mois", price: 15000 }], tag: "Populaire" },
+  { id: "steam", cat: "Gaming", icon: "🎲", name: "Steam Wallet", desc: "Crédit Steam pour jeux, DLC et contenus.", plans: credits, credit: true },
+  { id: "epic", cat: "Gaming", icon: "🏆", name: "Epic Games", desc: "Crédit Epic Games Store pour jeux et contenus.", plans: credits, credit: true },
+  { id: "m365", cat: "Logiciels", icon: "📊", name: "Microsoft 365 Personnel", desc: "Word, Excel, PowerPoint et 1 To de stockage.",
+    plans: [{ label: "1 an", price: 6500 }, { label: "2 ans", price: 12000 }] },
+  { id: "snapplus", cat: "Réseaux", icon: "👻", name: "Snapchat+", desc: "Fonctions exclusives Snapchat, badges et réglages avancés.", tag: "Nouveau",
+    plans: [
+      { label: "3 mois", price: 2800 }, { label: "6 mois", price: 5400 },
+      { label: "12 mois", price: 10000 }
+    ] },
+  { id: "pack-start", cat: "Packs Web", icon: "🚀", name: "Pack Démarrage", desc: "Site vitrine de 1 à 5 pages, design responsive et formulaire de contact.", plans: [{ label: "Pack complet", price: 45000 }], oneTime: true, tag: "Populaire" },
+  { id: "pack-business", cat: "Packs Web", icon: "💼", name: "Pack Business", desc: "Site jusqu'à 10 pages, animations au défilement, blog et SEO de base.", plans: [{ label: "Pack complet", price: 95000 }], oneTime: true },
+  { id: "pack-shop", cat: "Packs Web", icon: "🛒", name: "Pack Boutique", desc: "Boutique en ligne complète, import de produits et paiement à la livraison.", plans: [{ label: "Pack complet", price: 140000 }], oneTime: true },
+  { id: "pack-maint", cat: "Packs Web", icon: "🛠️", name: "Maintenance mensuelle", desc: "Mises à jour, sauvegardes, sécurité et support technique pour votre site.", plans: [{ label: "1 mois", price: 5000 }, { label: "3 mois", price: 14000 }, { label: "12 mois", price: 50000 }] },
+  { id: "gone", cat: "Logiciels", icon: "☁️", name: "Google One 100 Go", desc: "Stockage Drive, Photos et Gmail.", plans: dur(800) }
+];
+
+const CATS = ["Tous", ...new Set(PRODUCTS.map(p => p.cat))];
+const FEATURED = ["netflix", "spotify", "chatgpt"];
+const POPULAR = ["ytpremium", "ea", "gamepass"];
+const byId = id => PRODUCTS.find(p => p.id === id);
+const fmt = n => `${n.toLocaleString("fr-FR")} DZD`;
+const minPrice = p => Math.min(...p.plans.map(x => x.price));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const $ = id => document.getElementById(id);
+
+/* ---- Cartes ---- */
+function cardHTML(p, i = 0) {
+  return `<article class="card" data-id="${p.id}" style="animation-delay:${Math.min(i, 12) * 30}ms">
+    <div class="tile" aria-hidden="true">${p.icon}</div>
+    <span class="cat">${esc(p.cat)}${p.tag ? " · " + esc(p.tag) : ""}</span>
+    <h3>${esc(p.name)}</h3>
+    <p>${esc(p.desc)}</p>
+    <button class="visit" type="button" aria-label="Voir les offres ${esc(p.name)}">À partir de ${fmt(minPrice(p))}</button>
+  </article>`;
+}
+
+/* ---- Recherche et catégories ---- */
+let state = { q: "", cat: "Tous" };
+function renderChips() {
+  $("chips").innerHTML = CATS.map(c => `<button class="chip" type="button" aria-pressed="${state.cat === c}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+}
+function renderExplore() {
+  const q = state.q.trim().toLowerCase();
+  const list = PRODUCTS.filter(p =>
+    (state.cat === "Tous" || p.cat === state.cat) &&
+    (!q || `${p.name} ${p.cat} ${p.desc}`.toLowerCase().includes(q)));
+  $("grid").innerHTML = list.map(cardHTML).join("");
+  $("empty").hidden = list.length > 0;
+  $("status").textContent = list.length ? `${list.length} produit${list.length > 1 ? "s" : ""}` : "";
+  renderChips();
+}
+$("search").addEventListener("input", e => { state.q = e.target.value; renderExplore(); });
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  state.cat = b.dataset.cat; renderExplore();
+});
+$("reset").addEventListener("click", () => { state = { q: "", cat: "Tous" }; $("search").value = ""; renderExplore(); });
+
+/* ---- Sections ---- */
+$("featured").innerHTML = FEATURED.map(byId).map(cardHTML).join("");
+$("popular").innerHTML = POPULAR.map(byId).map(cardHTML).join("");
+$("category-sections").innerHTML = CATS.slice(1).map(c =>
+  `<div class="cat-block"><h2 class="reveal">${esc(c)}</h2><div class="grid">${PRODUCTS.filter(p => p.cat === c).map(cardHTML).join("")}</div></div>`
+).join("");
+const names = PRODUCTS.map(p => `<span>${esc(p.name)}</span>`).join("");
+$("ticker").innerHTML = names + names;
+renderExplore();
+
+/* ---- Navigation ---- */
+const menu = $("menu"), burger = $("burger");
+function closeMenu() { menu.classList.remove("open"); burger.setAttribute("aria-expanded", "false"); }
+burger.addEventListener("click", () => {
+  const open = menu.classList.toggle("open");
+  burger.setAttribute("aria-expanded", open);
+});
+menu.addEventListener("click", e => { if (e.target.tagName === "A") closeMenu(); });
+addEventListener("scroll", () => {
+  $("nav").classList.toggle("scrolled", scrollY > 10);
+  $("toTop").hidden = scrollY < 700;
+}, { passive: true });
+$("toTop").addEventListener("click", () => scrollTo({ top: 0 }));
+$("year").textContent = new Date().getFullYear();
+
+/* Révéler les titres au défilement */
+const rev = new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) { en.target.classList.add("in"); rev.unobserve(en.target); }
+}), { threshold: 0.3 });
+document.querySelectorAll(".reveal").forEach(el => rev.observe(el));
+const revObs = new MutationObserver(() => document.querySelectorAll(".reveal:not(.in)").forEach(el => rev.observe(el)));
+revObs.observe(document.body, { childList: true, subtree: true });
+
+/* ---- Compte à rebours GTA VI (heure d'Alger) ---- */
+/* ---- Animations : révélation des blocs et pulsation des secondes ---- */
+document.querySelectorAll(".section > h2, .section-head h2, .notes > div, .contact-links > *, .about p").forEach((el, i) => {
+  el.classList.add("reveal");
+  el.style.transitionDelay = (i % 4) * 90 + "ms";
+  rev.observe(el);
+});
+new MutationObserver(() => {
+  const box = $("cdS").parentElement;
+  box.classList.remove("tick"); void box.offsetWidth; box.classList.add("tick");
+}).observe($("cdS"), { childList: true, characterData: true, subtree: true });
+
+const GTA_DATE = new Date("2026-11-19T00:00:00+01:00").getTime();
+function tickGta() {
+  const diff = Math.max(0, GTA_DATE - Date.now());
+  $("cdD").textContent = Math.floor(diff / 86400000);
+  $("cdH").textContent = String(Math.floor(diff / 3600000) % 24).padStart(2, "0");
+  $("cdM").textContent = String(Math.floor(diff / 60000) % 60).padStart(2, "0");
+  $("cdS").textContent = String(Math.floor(diff / 1000) % 60).padStart(2, "0");
+}
+tickGta(); setInterval(tickGta, 1000);
+
+/* ---- Effet tilt sur les cartes (souris uniquement) ---- */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  document.addEventListener("pointermove", e => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--ry", (((e.clientX - r.left) / r.width - .5) * 10).toFixed(2) + "deg");
+    card.style.setProperty("--rx", ((.5 - (e.clientY - r.top) / r.height) * 8).toFixed(2) + "deg");
+  }, { passive: true });
+  document.addEventListener("pointerout", e => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (card) { card.style.removeProperty("--rx"); card.style.removeProperty("--ry"); }
+  });
+}
+
+/* ---- Fond animé : étoiles, poussière et particules ---- */
+(() => {
+  const cv = $("bg"), ctx = cv.getContext("2d");
+  const CY = "0,245,255", PU = "139,92,246";
+  let W, H, particles = [], dust = [], stars = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function setup() {
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(60, W * H / 24000));
+    particles = Array.from({ length: n }, () => ({ x: rnd(0, W), y: rnd(0, H), r: rnd(1, 2.4), vx: rnd(-.12, .12), vy: rnd(-.14, .06), c: Math.random() < .55 ? CY : PU, a: rnd(.25, .6) }));
+    dust = Array.from({ length: n * 2 }, () => ({ x: rnd(0, W), y: rnd(0, H), r: rnd(.4, .9), v: rnd(.03, .12), a: rnd(.1, .3) }));
+    stars = Array.from({ length: n }, () => ({ x: rnd(0, W), y: rnd(0, H), r: rnd(.5, 1.2), ph: rnd(0, 6.28), sp: rnd(.0006, .0018), c: Math.random() < .5 ? "255,255,255" : CY }));
+  }
+  function draw(t, dt) {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      ctx.fillStyle = `rgba(${s.c},${(.15 + .45 * (.5 + .5 * Math.sin(t * s.sp + s.ph))).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
+    }
+    for (const d of dust) {
+      d.y -= d.v * dt; if (d.y < -2) { d.y = H + 2; d.x = rnd(0, W); }
+      ctx.fillStyle = `rgba(200,210,255,${d.a})`; ctx.fillRect(d.x, d.y, d.r, d.r);
+    }
+    for (const p of particles) {
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.x < -10) p.x = W + 10; else if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; else if (p.y > H + 10) p.y = -10;
+      ctx.fillStyle = `rgba(${p.c},${p.a * .14})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 4, 0, 6.283); ctx.fill();
+      ctx.fillStyle = `rgba(${p.c},${p.a})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+    }
+  }
+  let resizeTimer;
+  addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(setup, 150); });
+  setup();
+  if (reduce) { draw(0, 0); return; }
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min((t - last) / 16.67, 3); last = t;
+    if (!document.hidden) draw(t, dt);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* =====================================================================
+   FENÊTRE DE COMMANDE : Offre → Paiement → Infos → Terminé
+   ===================================================================== */
+const STEPS = ["Offre", "Paiement", "Vos infos", "Terminé"];
+const ICON_PAY = k => PAY[k].icon;
+let st = null, step = 0, opener = null;
+const root = $("order"), body = $("orderBody"), stepsEl = $("steps");
+
+const makeRef = () => {
+  const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const r = n => Array.from({ length: n }, () => A[Math.floor(Math.random() * A.length)]).join("");
+  return `NX-${r(4)}-${r(4)}`;
+};
+const customUsd = () => { const n = Number(st.custom); return st.custom !== "" && Number.isInteger(n) && n >= CONFIG.customMin && n <= CONFIG.customMax ? n : null; };
+const plan = () => {
+  if (st.planIdx === "custom") { const n = customUsd() || 0; return { label: `Crédit $${n} (personnalisé)`, price: n * CONFIG.usdRate, usd: n }; }
+  return st.product.plans[st.planIdx];
+};
+const payLabel = () => PAY[st.pay].label;
+const waMessage = () => `Bonjour NEXORA, ma commande ${st.ref} : ${st.product.name} (${plan().label}) — ${fmt(plan().price)}. Paiement : ${payLabel()}.`;
+
+function planCards() {
+  return st.product.plans.map((p, i) => {
+    const on = st.planIdx === i;
+    const name = p.usd ? `$${p.usd} crédit` : p.label;
+    const period = (p.usd || st.product.oneTime) ? "Achat unique" : "Abonnement";
+    const note = p.usd ? `Taux d'exemple : ${CONFIG.usdRate} DZD pour 1 $` : "";
+    return `<button type="button" class="plan${on ? " is-selected" : ""}" data-plan="${i}" aria-pressed="${on}">
+      <span class="plan-name">${esc(name)}</span>
+      <span class="plan-period">${esc(period)}</span>
+      <span class="plan-price">${fmt(p.price)}</span>
+      ${note ? `<span class="plan-note">${esc(note)}</span>` : ""}
+      <span class="plan-sample">Prix d'exemple</span>
+      <span class="plan-pick">${on ? "Sélectionné ✓" : "Choisir"}</span></button>`;
+  }).join("");
+}
+function payCards() {
+  return Object.entries(PAY).map(([k, m]) => {
+    const on = st.pay === k;
+    return `<button type="button" class="pay${on ? " is-selected" : ""}" data-pay="${k}" aria-pressed="${on}">
+      <span class="pay-icon">${m.icon}</span>
+      <span class="pay-text"><strong>${esc(m.label)}</strong><small>${esc(m.blurb)}</small></span>
+      <span class="pay-pick">${on ? "Sélectionné ✓" : "Choisir"}</span></button>`;
+  }).join("");
+}
+function payDetails() {
+  if (!st.pay) return `<p class="muted">Choisissez un moyen de paiement pour voir les instructions.</p>`;
+  const m = PAY[st.pay];
+  return `<div class="pay-info"><h4>Comment payer avec ${esc(m.label)}</h4>
+    ${m.acct ? `<p class="acct"><span>${esc(m.acctLabel)}</span><strong>${esc(m.acct)}</strong></p>` : ""}
+    <ol style="margin-top:12px">${m.steps.map(t => `<li>${esc(t)}</li>`).join("")}</ol></div>`;
+}
+const summaryHTML = () => `<dl class="summary">
+  <div><dt>Produit</dt><dd>${esc(st.product.name)}</dd></div>
+  <div><dt>Offre</dt><dd>${esc(plan().label)}</dd></div>
+  <div><dt>Paiement</dt><dd>${esc(payLabel())}</dd></div>
+  <div class="total"><dt>Total</dt><dd>${fmt(plan().price)}</dd></div></dl>`;
+
+const banner = () => `<p class="sample-banner"><strong>Données d'exemple.</strong> ${esc(CONFIG.sampleNotice)}</p>`;
+function customCard() {
+  const on = st.planIdx === "custom", n = customUsd();
+  return `<div class="plan plan-custom${on ? " is-selected" : ""}" data-plan="custom" aria-pressed="${on}">
+    <span class="plan-name">Montant personnalisé</span>
+    <label class="custom-in"><span>$</span><input type="number" inputmode="numeric" min="${CONFIG.customMin}" max="${CONFIG.customMax}" step="1" placeholder="Montant en USD" value="${esc(st.custom)}" data-custom aria-label="Montant en dollars américains"></label>
+    <span class="plan-price" data-custom-price>${n ? fmt(n * CONFIG.usdRate) : "— DZD"}</span>
+    <span class="plan-note">$${CONFIG.customMin} à $${CONFIG.customMax}, dollars entiers</span>
+    <span class="plan-pick">${on ? "Sélectionné ✓" : "Choisir"}</span></div>`;
+}
+
+const views = [
+  () => `${banner()}<h3 class="step-title" tabindex="-1">Choisissez votre offre</h3>
+    <p class="step-sub">Prix en dinars algériens (DA).</p>
+    <div class="plans" role="group" aria-label="Offres">${planCards()}${st.product.credit ? customCard() : ""}</div>
+    <p class="form-error" id="err" role="alert"></p>
+    <div class="actions"><button type="button" class="btn btn-ghost" data-close>Annuler</button><button type="button" class="btn btn-primary" data-next>Continuer</button></div>`,
+
+  () => `${banner()}<h3 class="step-title" tabindex="-1">Choisissez le moyen de paiement</h3>
+    <p class="step-sub">Rien n'est débité sur ce site. Le paiement se fait selon les instructions ci-dessous.</p>
+    <div class="pays" role="group" aria-label="Moyens de paiement">${payCards()}</div>
+    ${payDetails()}
+    <p class="form-error" id="err" role="alert"></p>
+    <div class="actions"><button type="button" class="btn btn-ghost" data-back>Retour</button><button type="button" class="btn btn-primary" data-next>Continuer</button></div>`,
+
+  () => `<h3 class="step-title" tabindex="-1">Vérifiez et envoyez</h3>
+    ${summaryHTML()}
+    <div class="fields">
+      <div class="field"><label for="f-name">Nom complet</label><input id="f-name" data-f="name" value="${esc(st.name)}" maxlength="60" autocomplete="name"></div>
+      <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" data-f="email" value="${esc(st.email)}" maxlength="80" autocomplete="email" placeholder="vous@exemple.com"></div>
+      <div class="field"><label for="f-phone">Téléphone mobile</label><input id="f-phone" type="tel" data-f="phone" value="${esc(st.phone)}" maxlength="16" autocomplete="tel" placeholder="05XXXXXXXX"></div>
+    </div>
+    <div class="field" style="margin-top:16px"><label for="f-note">Note <span class="muted">(optionnel)</span></label><textarea id="f-note" data-f="note" maxlength="300">${esc(st.note)}</textarea></div>
+    <label class="check"><input type="checkbox" data-f="agree" ${st.agree ? "checked" : ""}><span>Je comprends que ma commande est <strong>en attente de paiement</strong> jusqu'à confirmation.</span></label>
+    <p class="form-error" id="err" role="alert"></p>
+    <div class="actions"><button type="button" class="btn btn-ghost" data-back>Retour</button><button type="button" class="btn btn-primary" data-send>Envoyer la commande</button></div>`,
+
+  () => `<div class="done-head"><svg class="check-draw" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="23"/><path d="M15 27l8 8 14-16"/></svg>
+    <h3 class="step-title" tabindex="-1">Commande envoyée</h3></div>
+    <p class="badge-pending">En attente de paiement</p>
+    <div class="ref-box"><div><span>Référence de commande</span><strong>${esc(st.ref)}</strong></div></div>
+    ${summaryHTML()}
+    <p class="notice">Gardez votre référence. Notre équipe vous contacte à l'adresse ou au numéro indiqué pour finaliser le paiement et l'activation.</p>
+    <a class="wa-link" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(waMessage())}" target="_blank" rel="noopener">Suivre ma commande sur WhatsApp →</a>
+    <div class="actions"><button type="button" class="btn btn-primary" data-close>Fermer</button></div>`
+];
+
+function render(dir = "fwd", animate = true) {
+  stepsEl.innerHTML = STEPS.map((t, i) => `<li class="${i === step ? "is-current" : ""}${i < step ? " is-done" : ""}"${i === step ? ' aria-current="step"' : ""}><span class="dot">${i < step ? "✓" : i + 1}</span><span class="lbl">${t}</span></li>`).join("");
+  body.className = "order-body";
+  body.innerHTML = views[step]();
+  if (animate) {
+    void body.offsetWidth;
+    body.classList.add("in-" + dir);
+    body.querySelector(".order-panel, .step-title")?.focus({ preventScroll: true });
+  }
+}
+const go = (n, dir) => { step = n; render(dir); };
+const showErr = msg => {
+  const el = $("err"); if (!el) return;
+  el.textContent = msg; el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
+};
+
+function openOrder(id, from) {
+  const product = byId(id); if (!product) return;
+  st = { product, planIdx: 0, custom: "", pay: "baridimob", name: "", email: "", phone: "", note: "", agree: false, ref: null };
+  step = 0; opener = from || document.activeElement;
+  $("orderTile").textContent = product.icon;
+  $("orderCat").textContent = product.cat;
+  $("orderTitle").textContent = product.name;
+  root.classList.remove("closing"); root.hidden = false; document.documentElement.classList.add("modal-open");
+  render("fwd");
+}
+function closeOrder() {
+  if (root.hidden || root.classList.contains("closing")) return;
+  root.classList.add("closing");
+  setTimeout(() => {
+    root.hidden = true; root.classList.remove("closing");
+    document.documentElement.classList.remove("modal-open");
+    if (opener && document.contains(opener)) opener.focus();
+  }, 210);
+}
+
+/* Ouvrir depuis une carte */
+document.addEventListener("click", e => {
+  const card = e.target.closest(".card[data-id]");
+  if (card && !root.contains(e.target)) openOrder(card.dataset.id, card.querySelector(".visit"));
+});
+
+/* Actions dans la fenêtre */
+root.addEventListener("click", async e => {
+  const t = e.target;
+  if (t.closest("[data-close]")) return closeOrder();
+  const pl = t.closest("[data-plan]"), py = t.closest("[data-pay]");
+  if (pl) { if (pl.dataset.plan === "custom" && st.planIdx === "custom") return; st.planIdx = pl.dataset.plan === "custom" ? "custom" : +pl.dataset.plan; render("fwd", false); body.querySelector(`[data-plan="${st.planIdx}"]`)?.focus(); return; }
+  if (py) { st.pay = py.dataset.pay; render("fwd", false); body.querySelector(`[data-pay="${st.pay}"]`)?.focus(); return; }
+  if (t.closest("[data-back]")) return go(step - 1, "back");
+  if (t.closest("[data-next]")) {
+    if (step === 0 && st.planIdx == null) return showErr("Choisissez une offre pour continuer.");
+    if (step === 0 && st.planIdx === "custom" && !customUsd()) return showErr(`Entrez un montant entier entre $${CONFIG.customMin} et $${CONFIG.customMax}.`);
+    if (step === 1 && !st.pay) return showErr("Choisissez un moyen de paiement pour continuer.");
+    return go(step + 1, "fwd");
+  }
+  if (t.closest("[data-send]")) return sendOrder(t.closest("[data-send]"));
+});
+
+root.addEventListener("input", e => {
+  if (e.target.matches("[data-custom]")) {
+    st.custom = e.target.value; st.planIdx = "custom";
+    const n = customUsd(), pr = body.querySelector("[data-custom-price]");
+    if (pr) pr.textContent = n ? fmt(n * CONFIG.usdRate) : "— DZD";
+    const card = body.querySelector(".plan-custom");
+    card.classList.add("is-selected"); card.querySelector(".plan-pick").textContent = "Sélectionné ✓";
+    body.querySelectorAll("button.plan.is-selected").forEach(b => { b.classList.remove("is-selected"); b.setAttribute("aria-pressed", "false"); b.querySelector(".plan-pick").textContent = "Choisir"; });
+    return;
+  }
+  const f = e.target.dataset.f; if (!f) return;
+  st[f] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+});
+
+async function sendOrder(btn) {
+  const phoneOk = /^(\+?213|0)[5-7][0-9]{8}$/.test(st.phone.replace(/\s/g, ""));
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(st.email.trim());
+  if (!st.name.trim()) return showErr("Entrez votre nom complet.");
+  if (!emailOk) return showErr("Entrez une adresse email valide.");
+  if (!phoneOk) return showErr("Entrez un numéro mobile algérien valide (05, 06 ou 07).");
+  if (!st.agree) return showErr("Cochez la case pour confirmer votre commande.");
+  if (CONFIG.formspreeUrl.includes("xxxxxxxx")) return showErr("Configuration incomplète : ajoutez votre endpoint Formspree.");
+
+  st.ref = makeRef();
+  btn.disabled = true; btn.textContent = "Envoi…";
+  try {
+    const res = await fetch(CONFIG.formspreeUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        _subject: `Nouvelle commande NEXORA ${st.ref} : ${st.product.name}`,
+        _replyto: st.email.trim(),
+        reference: st.ref,
+        produit: st.product.name,
+        offre: plan().label,
+        prix: fmt(plan().price),
+        paiement: payLabel(),
+        nom: st.name.trim(),
+        email: st.email.trim(),
+        telephone: st.phone.trim(),
+        note: st.note.trim()
+      })
+    });
+    if (!res.ok) throw new Error("send failed");
+    go(3, "fwd");
+  } catch {
+    btn.disabled = false; btn.textContent = "Envoyer la commande";
+    showErr("Envoi impossible. Vérifiez votre connexion et réessayez, ou écrivez-nous sur WhatsApp.");
+  }
+}
+
+document.addEventListener("keydown", e => {
+  if (root.hidden) return;
+  if (e.key === "Escape") { closeOrder(); return; }
+  if (e.key !== "Tab") return;
+  const f = [...root.querySelectorAll("a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])")].filter(el => el.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+/* ===== CUSTOM CURSOR: anneau, traînée colorée, éclats au clic ===== */
+(() => {
+  const root = document.documentElement;
+  const fine = matchMedia("(hover: hover) and (pointer: fine) and (min-width: 761px)");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cursor = $("cursor"), dot = $("cursorDot");
+  const mouse = { x: -100, y: -100 }, ring = { x: -100, y: -100 };
+  const trail = Array.from({ length: 8 }, (_, i) => {
+    const el = document.createElement("i");
+    el.className = "trail-dot"; el.setAttribute("aria-hidden", "true");
+    el.style.setProperty("--i", i); document.body.appendChild(el);
+    return { el, x: -100, y: -100 };
+  });
+  let active = false;
+  const TARGET = "a, button, .card, .chip, .plan, .pay, summary, label, [role=button]";
+
+  addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse") return;
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    if (!active && fine.matches) {
+      active = true; ring.x = mouse.x; ring.y = mouse.y;
+      trail.forEach(t => { t.x = mouse.x; t.y = mouse.y; });
+      root.classList.add("has-cursor");
+    }
+    cursor.classList.toggle("is-target", !!e.target.closest(TARGET));
+    root.classList.toggle("over-text", !!e.target.closest("input:not([type=checkbox]), textarea, select"));
+  }, { passive: true });
+  root.addEventListener("mouseleave", () => root.classList.add("cursor-off"));
+  root.addEventListener("mouseenter", () => root.classList.remove("cursor-off"));
+  addEventListener("pointerdown", e => {
+    if (!active || e.pointerType !== "mouse") return;
+    cursor.classList.add("is-down");
+    ripple(e.clientX, e.clientY);
+    burst(e.clientX, e.clientY);
+  });
+  addEventListener("pointerup", () => cursor.classList.remove("is-down"));
+  fine.addEventListener("change", () => {
+    if (!fine.matches) { active = false; root.classList.remove("has-cursor"); }
+  });
+
+  function ripple(x, y) {
+    const r = document.createElement("span");
+    r.className = "ripple"; r.setAttribute("aria-hidden", "true");
+    r.style.setProperty("--x", x + "px"); r.style.setProperty("--y", y + "px");
+    document.body.appendChild(r); setTimeout(() => r.remove(), 700);
+  }
+  function burst(x, y) {
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement("span");
+      p.className = "spark-p"; p.setAttribute("aria-hidden", "true");
+      p.style.left = x + "px"; p.style.top = y + "px";
+      document.body.appendChild(p);
+      const a = (Math.PI * 2 * i) / 10 + Math.random() * .4, d = 28 + Math.random() * 26;
+      const anim = p.animate([
+        { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(0)`, opacity: 0 }
+      ], { duration: 600 + Math.random() * 200, easing: "cubic-bezier(.2, .8, .2, 1)" });
+      anim.onfinish = () => p.remove();
+    }
+  }
+
+  (function frame() {
+    if (active) {
+      ring.x += (mouse.x - ring.x) * .18; ring.y += (mouse.y - ring.y) * .18;
+      cursor.style.transform = `translate3d(${ring.x}px, ${ring.y}px, 0)`;
+      dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
+      let px = mouse.x, py = mouse.y;
+      for (const t of trail) {
+        t.x += (px - t.x) * .3; t.y += (py - t.y) * .3;
+        t.el.style.transform = `translate3d(${t.x}px, ${t.y}px, 0)`;
+        px = t.x; py = t.y;
+      }
+    }
+    requestAnimationFrame(frame);
+  })();
+})();
+
+</script>
+</body>
+</html>
