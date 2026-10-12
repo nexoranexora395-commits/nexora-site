@@ -490,7 +490,7 @@ html.over-text .cursor, html.over-text .cursor-dot, html.over-text .trail-dot, h
     <h1>Tout le digital.<br>Un seul endroit.</h1>
     <p class="lead">Musique, films, jeux, intelligence artificielle et logiciels. Choisissez votre offre, payez localement et recevez votre accès rapidement.</p>
     <a class="btn btn-primary" href="#explore">Trouver mon abonnement</a>
-    <p class="fine">Paiement local (BaridiMob, CCP, remise en main propre) · Support WhatsApp · Livraison rapide</p>
+    <p class="fine">Paiement par BaridiMob · Support WhatsApp · Livraison rapide</p>
     <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
   </section>
 
@@ -508,6 +508,19 @@ html.over-text .cursor, html.over-text .cursor-dot, html.over-text .trail-dot, h
         </div>
         <a class="btn btn-ghost" style="align-self:start" href="https://wa.me/213797784310?text=Bonjour%2C%20je%20veux%20%C3%AAtre%20inform%C3%A9%20de%20la%20sortie%20de%20GTA%20VI" target="_blank" rel="noopener">Être informé sur WhatsApp</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="coming-soon" style="padding-bottom:0">
+    <div class="section-head"><h2>Bientôt disponible</h2></div>
+    <div class="grid grid-3">
+      <article class="card" aria-label="Boutiques en ligne, bientôt disponible">
+        <div class="tile" aria-hidden="true">🛍️</div>
+        <span class="cat">Bientôt disponible</span>
+        <h3>Boutiques en ligne</h3>
+        <p>Achetez des produits sur les grandes boutiques en ligne, avec notre accompagnement.</p>
+        <a class="visit" href="https://wa.me/213797784310?text=Bonjour%2C%20je%20veux%20%C3%AAtre%20inform%C3%A9%20de%20l%27ouverture%20de%20la%20cat%C3%A9gorie%20Boutiques%20en%20ligne." target="_blank" rel="noopener">Être informé sur WhatsApp</a>
+      </article>
     </div>
   </section>
 
@@ -611,12 +624,8 @@ const CONFIG = {
 };
 
 const PAY = {
-  baridimob: { label: "BaridiMob", blurb: "Depuis l'application BaridiMob", icon: "📱", acctLabel: "BaridiMob (RIP)", acct: "00799999004488391675 — nom : Adem Belgaid",
+  baridimob: { label: "BaridiMob", blurb: "Depuis l'application BaridiMob", icon: "📱", acctLabel: "BaridiMob (RIP)", acct: "00799999004488391624 — nom : Adem Belgaid",
     steps: ["Ouvrez l'application BaridiMob et faites un transfert.", "Envoyez le montant exact au numéro indiqué.", "Gardez la capture du reçu et envoyez-la sur WhatsApp."] },
-  ccp: { label: "CCP", blurb: "Virement postal", icon: "✉️", acctLabel: "RIP CCP", acct: "00799999004488391675 — nom : Adem Belgaid",
-    steps: ["Effectuez un virement vers le RIP indiqué.", "Gardez le reçu postal.", "Envoyez le reçu sur WhatsApp."] },
-  main: { label: "Main propre (Kouba)", blurb: "Paiement en espèces à Kouba", icon: "🤝", acctLabel: "Lieu", acct: "Kouba, Alger",
-    steps: ["Confirmez votre commande.", "Nous fixons le lieu et l'heure sur WhatsApp.", "Payez en espèces lors de la remise."] }
 };
 
 /* Durée : 1, 3 ou 12 mois, avec une remise sur les longues durées */
@@ -660,6 +669,10 @@ const PRODUCTS = [
       { label: "3 mois", price: 2800 }, { label: "6 mois", price: 5400 },
       { label: "12 mois", price: 10000 }
     ] },
+  { id: "pack-start", cat: "Packs Web", icon: "🚀", name: "Pack Démarrage", desc: "Site vitrine de 1 à 5 pages, design responsive et formulaire de contact.", plans: [{ label: "Pack complet", price: 45000 }], oneTime: true, tag: "Populaire" },
+  { id: "pack-business", cat: "Packs Web", icon: "💼", name: "Pack Business", desc: "Site jusqu'à 10 pages, animations au défilement, blog et SEO de base.", plans: [{ label: "Pack complet", price: 95000 }], oneTime: true },
+  { id: "pack-shop", cat: "Packs Web", icon: "🛒", name: "Pack Boutique", desc: "Boutique en ligne complète, import de produits et paiement à la livraison.", plans: [{ label: "Pack complet", price: 140000 }], oneTime: true },
+  { id: "pack-maint", cat: "Packs Web", icon: "🛠️", name: "Maintenance mensuelle", desc: "Mises à jour, sauvegardes, sécurité et support technique pour votre site.", plans: [{ label: "1 mois", price: 5000 }, { label: "3 mois", price: 14000 }, { label: "12 mois", price: 50000 }] },
   { id: "gone", cat: "Logiciels", icon: "☁️", name: "Google One 100 Go", desc: "Stockage Drive, Photos et Gmail.", plans: dur(800) }
 ];
 
@@ -847,7 +860,7 @@ function planCards() {
   return st.product.plans.map((p, i) => {
     const on = st.planIdx === i;
     const name = p.usd ? `$${p.usd} crédit` : p.label;
-    const period = p.usd ? "Achat unique" : "Abonnement";
+    const period = (p.usd || st.product.oneTime) ? "Achat unique" : "Abonnement";
     const note = p.usd ? `Taux d'exemple : ${CONFIG.usdRate} DZD pour 1 $` : "";
     return `<button type="button" class="plan${on ? " is-selected" : ""}" data-plan="${i}" aria-pressed="${on}">
       <span class="plan-name">${esc(name)}</span>
@@ -945,7 +958,7 @@ const showErr = msg => {
 
 function openOrder(id, from) {
   const product = byId(id); if (!product) return;
-  st = { product, planIdx: 0, custom: "", pay: null, name: "", email: "", phone: "", note: "", agree: false, ref: null };
+  st = { product, planIdx: 0, custom: "", pay: "baridimob", name: "", email: "", phone: "", note: "", agree: false, ref: null };
   step = 0; opener = from || document.activeElement;
   $("orderTile").textContent = product.icon;
   $("orderCat").textContent = product.cat;
