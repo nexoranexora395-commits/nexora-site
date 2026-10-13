@@ -621,7 +621,7 @@ html.over-text .cursor, html.over-text .cursor-dot, html.over-text .trail-dot, h
 const CONFIG = {
   whatsapp: "213797784310",                          // numéro WhatsApp sans +
   email: "nexoranexora395@gmail.com",
-  usdRate: 250,            // EXEMPLE : DA pour 1 USD. Remplacez par votre taux réel.
+  usdRate: 260,            // EXEMPLE : DZD pour 1 USD. Remplacez par votre taux réel.
   customMin: 1, customMax: 1000,   // montant personnalisé autorisé, en USD
   sampleNotice: "Prix et coordonnées de paiement d'exemple. Remplacez-les dans CONFIG et PAY avant la mise en ligne.",
   formspreeUrl: "https://formspree.io/f/mjygrovz"    // votre endpoint Formspree
@@ -664,7 +664,11 @@ const PRODUCTS = [
   { id: "claude", cat: "IA", icon: "✨", name: "Claude Pro", desc: "Modèles avancés et limites d'utilisation élevées.", plans: dur(4500), tag: "Nouveau" },
   { id: "canva", cat: "Design", icon: "🎨", name: "Canva Pro", desc: "Modèles premium et export haute qualité.", plans: dur(1000) },
   { id: "gamepass", cat: "Gaming", icon: "🎮", name: "Xbox Game Pass Ultimate", desc: "Des centaines de jeux et le multijoueur en ligne.", plans: dur(3500) },
-  { id: "psplus", cat: "Gaming", icon: "🕹️", name: "PlayStation Plus", desc: "Jeux mensuels et multijoueur en ligne.", plans: dur(3000) },
+  { id: "psplus", cat: "Gaming", icon: "🕹️", name: "PlayStation Plus", desc: "Jeux mensuels et multijoueur en ligne. Choisissez votre formule.", plans: [
+    { label: "Essential · 1 mois", price: 3000 }, { label: "Essential · 3 mois", price: 8400 }, { label: "Essential · 6 mois", price: 16200 },
+    { label: "Extra · 1 mois", price: 5000 }, { label: "Extra · 3 mois", price: 14000 }, { label: "Extra · 6 mois", price: 27000 },
+    { label: "Premium · 1 mois", price: 8000 }, { label: "Premium · 3 mois", price: 22400 }, { label: "Premium · 6 mois", price: 43200 }
+  ] },
   { id: "discord", cat: "Gaming", icon: "💬", name: "Discord Nitro", desc: "Emojis animés, meilleure qualité vidéo.", plans: dur(1500) },
   { id: "ea", cat: "Gaming", icon: "⚽", name: "EA Play", desc: "Accès aux jeux EA Sports, dont EA Sports FC.",
     plans: [{ label: "1 mois", price: 1800 }, { label: "3 mois", price: 4800 }, { label: "12 mois", price: 15000 }], tag: "Populaire" },
