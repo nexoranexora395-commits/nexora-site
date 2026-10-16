@@ -168,6 +168,9 @@ a { color: inherit; }
 .card:hover::after { animation: cardSweep .9s ease; }
 @keyframes cardSweep { to { transform: translateX(340%) skewX(-18deg); } }
 .tile { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem; background: rgba(0, 245, 255, 0.07); border: 1px solid rgba(0, 245, 255, 0.3); transition: box-shadow .3s, background .3s; }
+.tile.has-logo { padding: 0; overflow: hidden; border-color: rgba(255,255,255,.18); }
+.tile.has-logo svg { width: 100%; height: 100%; display: block; }
+.card:hover .tile.has-logo { box-shadow: 0 0 20px rgba(139, 92, 246, 0.45); }
 .card:hover .tile { background: rgba(0, 245, 255, 0.14); box-shadow: 0 0 20px rgba(0, 245, 255, 0.35); }
 .card .cat { color: var(--purple-soft); font-weight: 600; font-size: .85rem; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tag { font-size: .72rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #04070a; background: var(--grad); border-radius: 999px; padding: 3px 10px; }
@@ -677,11 +680,49 @@ const minPrice = p => Math.min(...p.plans.map(x => x.price));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const $ = id => document.getElementById(id);
 
+const LOGOS = {
+  "spotify": ["#1DB954", "<path d=\"M5.5 9.2c4.8-1.4 9.700-1 13.500 1.500M6.500 12.700c3.900-1 7.500-.7 10.500 1.200M7.500 16c3-.7 5.700-.5 8 1\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"/>"],
+  "apple-music": ["linear-gradient(135deg,#FA233B,#FB5C74)", "<path d=\"M16.500 4.500v10.200a2.700 2.700 0 1 1-1.600-2.500V8L10 9.100v7.600a2.700 2.700 0 1 1-1.600-2.500V6.200z\" fill=\"#fff\"/>"],
+  "deezer": ["#121216", "<g><rect x=\"3\" y=\"16\" width=\"3.200\" height=\"3\" fill=\"#40AB5D\"/><rect x=\"7.200\" y=\"16\" width=\"3.200\" height=\"3\" fill=\"#40AB5D\"/><rect x=\"7.200\" y=\"12\" width=\"3.200\" height=\"3\" fill=\"#3C86C6\"/><rect x=\"11.400\" y=\"16\" width=\"3.200\" height=\"3\" fill=\"#C9318F\"/><rect x=\"11.400\" y=\"12\" width=\"3.200\" height=\"3\" fill=\"#C9318F\"/><rect x=\"11.400\" y=\"8\" width=\"3.200\" height=\"3\" fill=\"#E8A020\"/><rect x=\"15.600\" y=\"16\" width=\"3.200\" height=\"3\" fill=\"#E04F2E\"/><rect x=\"15.600\" y=\"12\" width=\"3.200\" height=\"3\" fill=\"#E04F2E\"/><rect x=\"15.600\" y=\"8\" width=\"3.200\" height=\"3\" fill=\"#E04F2E\"/><rect x=\"15.600\" y=\"4\" width=\"3.200\" height=\"3\" fill=\"#E04F2E\"/><rect x=\"19.800\" y=\"16\" width=\"3.200\" height=\"3\" fill=\"#E04F2E\"/></g>"],
+  "ytmusic": ["#0F0F0F", "<circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"#F00\"/><circle cx=\"12\" cy=\"12\" r=\"5.600\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.200\"/><path d=\"M10.300 9.200v5.600l4.800-2.800z\" fill=\"#fff\"/>"],
+  "soundcloud": ["#FF5500", "<path d=\"M7.500 17h9.800a3.200 3.200 0 0 0 .4-6.300A5.200 5.200 0 0 0 7.500 9.400z\" fill=\"#fff\"/><path d=\"M4.500 12.500v4M6 11.500v5\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.200\"/>"],
+  "netflix": ["#000", "<path d=\"M7 3.500h3.200v17H7zM13.800 3.500H17v17h-3.200z\" fill=\"#B20710\"/><path d=\"M7 3.500h3.200L17 20.500h-3.200z\" fill=\"#E50914\"/>"],
+  "disney": ["linear-gradient(135deg,#0B2A8F,#1E5BFF)", "<text x=\"12\" y=\"15.500\" text-anchor=\"middle\" font-family=\"Georgia,serif\" font-style=\"italic\" font-weight=\"700\" font-size=\"9\" fill=\"#fff\">Disney+</text>"],
+  "prime": ["#00A8E1", "<text x=\"12\" y=\"12.500\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-weight=\"700\" font-size=\"7.500\" fill=\"#fff\">prime</text><path d=\"M6.500 16c3.500 2 7.500 2 11 0\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.400\"/><path d=\"M15.500 15.200l2.200.7-.9 2\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.200\"/>"],
+  "ytpremium": ["#fff", "<rect x=\"2.500\" y=\"5.800\" width=\"19\" height=\"12.400\" rx=\"3.600\" fill=\"#F00\"/><path d=\"M10 9.100v5.800l5-2.900z\" fill=\"#fff\"/>"],
+  "chatgpt": ["#10A37F", "<path d=\"M12 3.500l7.400 4.250v8.500L12 20.500l-7.400-4.250v-8.500z\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.600\"/><path d=\"M12 3.500v8.500l7.400 4.250M12 12l-7.400 4.250M12 12l7.400-4.250\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.400\"/>"],
+  "claude": ["#D97757", "<g fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2.200\"><path d=\"M12 10.5V4\" transform=\"rotate(0 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(36 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(72 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(108 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(144 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(180 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(216 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(252 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(288 12 12)\"/><path d=\"M12 10.5V4\" transform=\"rotate(324 12 12)\"/></g>"],
+  "canva": ["linear-gradient(135deg,#00C4CC,#7D2AE8)", "<path d=\"M16.500 9.200a5.200 5.200 0 1 0 0 5.600\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2.400\"/>"],
+  "gamepass": ["#107C10", "<circle cx=\"12\" cy=\"12\" r=\"8.200\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.500\"/><path d=\"M8 7.800c2.600 2 5.600 6.700 8 8.800M16 7.800c-2.600 2-5.600 6.700-8 8.800\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.800\"/>"],
+  "psplus": ["#003791", "<text x=\"11\" y=\"15\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-style=\"italic\" font-weight=\"800\" font-size=\"10\" fill=\"#fff\">PS</text><path d=\"M18.500 6.500v5M16 9h5\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"#FFC72C\" stroke-width=\"1.800\"/>"],
+  "discord": ["#5865F2", "<path d=\"M7 6.500c1.500-.7 3-1 5-1s3.500.3 5 1c1.600 2.500 2.500 5.200 2.800 8.300-1.200.9-2.400 1.500-3.700 1.900l-.9-1.500c.5-.2 1-.4 1.400-.7-1.800.8-3.500 1.200-4.600 1.200s-2.800-.4-4.600-1.200c.4.3.9.5 1.400.7l-.9 1.500c-1.300-.4-2.500-1-3.700-1.900C4.500 11.700 5.400 9 7 6.500z\" fill=\"#fff\"/><circle cx=\"9.500\" cy=\"12\" r=\"1.300\" fill=\"#5865F2\"/><circle cx=\"14.500\" cy=\"12\" r=\"1.300\" fill=\"#5865F2\"/>"],
+  "ea": ["#FF4747", "<text x=\"12\" y=\"16\" text-anchor=\"middle\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"11\" fill=\"#fff\">EA</text>"],
+  "steam": ["linear-gradient(135deg,#171A21,#2A475E)", "<circle cx=\"15\" cy=\"9.500\" r=\"3.600\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.600\"/><circle cx=\"8.500\" cy=\"15.500\" r=\"2.600\" fill=\"#fff\"/><path d=\"M10.800 14.300l2.600-3M3.500 13.500l3.500 1.400\" fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.600\"/>"],
+  "epic": ["#2A2A2A", "<path d=\"M5.500 3.500h13v13L12 20.500l-6.500-4z\" fill=\"#fff\"/><text x=\"12\" y=\"13.200\" text-anchor=\"middle\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"5.600\" fill=\"#2A2A2A\">EPIC</text>"],
+  "m365": ["#fff", "<rect x=\"3.500\" y=\"3.500\" width=\"8\" height=\"8\" fill=\"#F25022\"/><rect x=\"12.500\" y=\"3.500\" width=\"8\" height=\"8\" fill=\"#7FBA00\"/><rect x=\"3.500\" y=\"12.500\" width=\"8\" height=\"8\" fill=\"#00A4EF\"/><rect x=\"12.500\" y=\"12.500\" width=\"8\" height=\"8\" fill=\"#FFB900\"/>"],
+  "gone": ["#fff", "<circle cx=\"12\" cy=\"12\" r=\"8.500\" fill=\"#4285F4\"/><path d=\"M10 9.800l2.600-1.600v7.600\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"],
+  "snapplus": ["#FFFC00", "<path d=\"M12 4c-2.800 0-4.500 2.100-4.500 4.800v2.200c-.5.300-1.200.5-2 .5.5 1 1.500 1.200 2.200 1.500-.3 1.100-1.300 1.700-2.200 2 .8.600 2 .6 2.800.9.400.5.500 1.300 1.200 1.300.8 0 1.500-.7 2.500-.7s1.700.7 2.500.7c.7 0 .8-.8 1.200-1.300.8-.3 2-.3 2.800-.9-.9-.3-1.900-.9-2.200-2 .7-.3 1.700-.5 2.200-1.500-.8 0-1.500-.2-2-.5V8.800C16.500 6.100 14.800 4 12 4z\" fill=\"#fff\" stroke=\"#000\" stroke-width=\"1.200\" stroke-linejoin=\"round\"/>"]
+};
+function logoSVG(p) {
+  const l = LOGOS[p.id]; if (!l) return null;
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="24" height="24" fill="${l[0].startsWith("linear") ? "url(#g" + p.id + ")" : l[0]}"/>${l[0].startsWith("linear") ? gradDef(p.id, l[0]) : ""}${l[1]}</svg>`;
+}
+function gradDef(id, g) {
+  const c = g.match(/#[0-9A-Fa-f]{6}/g);
+  return `<defs><linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs>`;
+}
+function setTile(el, p) {
+  const s = logoSVG(p);
+  el.classList.toggle("has-logo", !!s);
+  if (s) el.innerHTML = s; else el.textContent = p.icon;
+}
+function tileInner(p) { return logoSVG(p) || p.icon; }
+function tileClass(p) { return LOGOS[p.id] ? "tile has-logo" : "tile"; }
 /* ---- Cartes ---- */
 function cardHTML(p, i = 0) {
   const group = CAT_GROUPS[p.cat];
   return `<article class="card" data-id="${p.id}" style="animation-delay:${Math.min(i, 12) * 30}ms">
-    <div class="tile" aria-hidden="true">${p.icon}</div>
+    <div class="${tileClass(p)}" aria-hidden="true">${tileInner(p)}</div>
     <span class="cat">${esc(group)}${p.tag ? `<span class="tag">${esc(p.tag)}</span>` : ""}</span>
     <h3>${esc(p.name)}</h3>
     <p>${esc(p.desc)}</p>
@@ -924,7 +965,7 @@ function openOrder(id, from) {
   const product = byId(id); if (!product) return;
   st = { product, planIdx: 0, custom: "", pay: null, name: "", email: "", phone: "", note: "", agree: false, ref: null };
   step = 0; opener = from || document.activeElement;
-  $("orderTile").textContent = product.icon;
+  setTile($("orderTile"), product);
   $("orderCat").textContent = CAT_GROUPS[product.cat];
   $("orderTitle").textContent = product.name;
   root.classList.remove("closing"); root.hidden = false; document.documentElement.classList.add("modal-open");
